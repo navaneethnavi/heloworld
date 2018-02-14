@@ -7,6 +7,11 @@ var dataStore = new  Object();
   
 http.createServer(function(request, response)
 {
+    response.writeHead(200, {'Content-Type': 'text/plain'});  
+    response.write("This is Test Message.");  
+    response.end();  
+	
+	
     request.on('data', function (data)										
         {			
             jsonParsed = JSON.parse(data); 															//Json parsed data recieved from the client
@@ -21,6 +26,7 @@ http.createServer(function(request, response)
 					dataStore[devid].dhash1=jsonParsed.SHA256Hash;
 					console.log('\nData-1: '+dataStore[devid].data1);
 					response.writeHead(200, { 'Content-Type': 'text/plain'});
+					response.write('Hello Node.js Server has recived the data');
 					response.end('Hello Node.js Server has recived the data')
 					//response.end();
 				}
