@@ -1,9 +1,13 @@
 {
   "name": "node-js-sample",
   "version": "6.12.3",
-  "description": "A sample Node.js app using Express 4",
-  "main": "index.js",
+  "description": "A sample Node.js ",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js"
-  "license": "MIT"
+    "start": "node server.js"
+},
+"engines": {
+    "node": "6.12.3",
+    "npm": "3.10.10"
+  }
 }
