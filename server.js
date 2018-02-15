@@ -5,21 +5,20 @@ const fs = require('fs');
 var devid='';																						//Device id : Which is send from the board
 var validDeviceId = ['RPI1', 'RPI2', 'RPI3', 'RPI4', 'RPI5', 'RPI6'];								// List of Valid device IDs 
 var dataStore = new  Object();
-
-/*
+const PORT = process.env.PORT || 8080;
+  
 fs.writeFile('Valid.txt', '\t\t\t\tAccepted data\n\n'); 
-fs.appendFile('Valid.txt', 'Sl.No.  Dev-ID    Pkt-No:\t\tData\t\t\tHash\n');
+fs.appendFile('Valid.txt', 'Sl.No.  Dev-ID    Pkt-No:\t\tData\t\t\t\tHash\n');
 var sl1=0; 
 fs.writeFile('Invalid.txt', '\t\t\t\tInvalid data\n\n'); 
-fs.appendFile('Invalid.txt', 'Sl.No.  Dev-ID    Pkt-No:\t\tData\t\t\tHash\n');
+fs.appendFile('Invalid.txt', 'Sl.No.  Dev-ID    Pkt-No:\t\t\tData\t\t\t\tHash\n');
 var sl2=0;
 fs.writeFile('Rouge.txt', '\t\t\t\tRouge Devices\n\n'); 
-fs.appendFile('Rouge.txt', 'Sl.No.  Dev-ID    Pkt-No:\t\tData\t\t\tHash\n');
+fs.appendFile('Rouge.txt', 'Sl.No.  Dev-ID    Pkt-No:\t\tData\t\t\t\t\tHash\n');
 var sl3
-*/
 
-http.createServer(function(request, response)
-{
+function handleRequest(request, response){
+    response.end('\nServer working properly. Requested URL :' + request.url);
     
     request.on('data', function (data)										
         {			
@@ -57,30 +56,26 @@ http.createServer(function(request, response)
 					if(dataStore[devid].Servhash==dataStore[devid].dhash1)
 					{
 						console.log('\n\t\tData Validated');
-						/*
-            fs.appendFile('Valid.txt',sl1+'\t  '+devid+'     |'+pktno+'|\t'+dataStore[devid].data1+'\t'+dataStore[devid].dhash1+'\n' , (err) =>
+						fs.appendFile('Valid.txt',sl1+'\t  '+devid+'     |'+pktno+'|\t\t'+dataStore[devid].data1+'\t'+dataStore[devid].dhash1+'\n' , (err) =>
 						{ 
 							if (err) throw err;
 							sl1+=1;
 						});
-            */
 						dataStore[devid].dhash1=dataStore[devid].dhash2;
 						dataStore[devid].data1=dataStore[devid].data2;
 					}
 					else
 					{
-						/*
-            fs.appendFile('Invalid.txt',sl2+'\t  '+devid+'     |'+pktno+'|\t'+dataStore[devid].data2+'\t'+dataStore[devid].dhash2+'\n' , (err) =>
+						fs.appendFile('Invalid.txt',sl2+'\t  '+devid+'     |'+pktno+'|\t\t'+dataStore[devid].data2+'\t'+dataStore[devid].dhash2+'\n' , (err) =>
 						{ 
 							if (err) throw err;
 							sl2+=1;
 						});
-            */
 						console.log('\n\t      ----------------------------------------------------');
 						console.log('\t******Invalid Packet :Block did not get added to the Chain******');
 						console.log('\t      ----------------------------------------------------');
 					}
-					response.setHeader('Content-Type', 'text/html');
+					//response.setHeader('Content-Type', 'text/html');
 					response.writeHead(200, { 'Content-Type': 'text/plain'});
 					response.end('Server has received the message');
 					
@@ -91,36 +86,27 @@ http.createServer(function(request, response)
 			} 					
 			else
 			{
-			/*
-        fs.appendFile('Rouge.txt',sl3+'\t  '+devid+'     |'+pktno+'|\t'+jsonParsed.Sdata+jsonParsed.TimeS+jsonParsed.RSSI+'\t'+jsonParsed.SHA256Hash+'\n' , (err) =>
+				fs.appendFile('Rouge.txt',sl3+'\t  '+devid+'     |'+pktno+'|\t\t'+jsonParsed.Sdata+jsonParsed.TimeS+jsonParsed.RSSI+'\t'+jsonParsed.SHA256Hash+'\n' , (err) =>
 				{ 
 					if (err) throw err;
 						sl3+=1;
 				});
-        */
 				console.log('\n\t#####################################################');
 				console.log('\t# Data Recieved  from an Invalid Device ID -> '+ '"'+devid+'"'+' #');
 				console.log('\t#####################################################');		
 				
-				response.setHeader('Content-Type', 'text/html');
+				//response.setHeader('Content-Type', 'text/html');
 				response.writeHead(200, { 'Content-Type': 'text/plain'});
 				response.end('Invalid Device  ID |Administrator will be notified');
-				
-				
-				/*const body = 'hello world';
-				response.writeHead(200, body ,{'Content-Length': Buffer.byteLength(body),'Content-Type': 'text/plain' });
-
-				
-				var message = 'Invalid Device ID';
-				response.writeHead(400, message, {'content-type' : 'text/plain'});
-				response.end(message);   
-				
-				response.writeHead(400, { 'Content-Type': 'text/plain','Trailer': 'Server-Message' });
-                response.addTrailers({ 'Server-Message': 'Invalid Device ID' });
-				response.end();	*/
 			}
 							 
         });
   
+}
+//http.createServer(function(request, response)
+const server = http.createServer(handleRequest)
 
-}).listen(80);
+
+server.listen(PORT, () => {
+  console.log('Server listening on: http://localhost:%s', PORT);
+});
